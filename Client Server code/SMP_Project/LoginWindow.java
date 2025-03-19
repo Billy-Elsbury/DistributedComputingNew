@@ -71,6 +71,9 @@ public class LoginWindow extends JFrame {
     }
 
     private JPanel getJPanel(JTextField userField, JPasswordField passField) {
+        userField.setText("Peter");
+        passField.setText("Password");
+
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         buttonPanel.setBackground(new Color(30, 30, 30));
 
