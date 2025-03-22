@@ -31,18 +31,19 @@ public class SMPServer {
             SSLServerSocket sslServerSocket =
                     (SSLServerSocket) sslServerSocketFactory.createServerSocket(serverPort);
 
-            System.out.println("SMP Server (SSL) ready on port " + serverPort);
+            SMPServerUI.getInstance().log("SMP Server (SSL) ready on port " + serverPort);
 
             while (true) {  // Forever loop to accept client connections
-                System.out.println("Waiting for a connection...");
+                SMPServerUI.getInstance().log("Waiting for a connection...");
                 MyStreamSocket myDataSocket = new MyStreamSocket(sslServerSocket.accept());
-                System.out.println("Connection accepted.");
+                SMPServerUI.getInstance().log("Connection accepted.");
 
                 // Start a new thread to handle the client session
                 Thread theThread = new Thread(new SMPThread(myDataSocket));
                 theThread.start();
             }
         } catch (Exception ex) {
+            SMPServerUI.getInstance().log("Exception: " + ex.getMessage());
             ex.printStackTrace();
         }
     }

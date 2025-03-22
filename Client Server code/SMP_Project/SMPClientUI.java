@@ -115,11 +115,11 @@ public class SMPClientUI extends JFrame {
 
     private void upload(String message, String id) {
         if (username == null) {
-            outputArea.append(ErrorCodes.NOT_LOGGED_IN + " Not logged in.\n");
+            outputArea.append(ResponseCodes.NOT_LOGGED_IN + " Not logged in.\n");
             return;
         }
         if (message.isEmpty()) {
-            outputArea.append(ErrorCodes.EMPTY_MESSAGE + " Message content cannot be empty.\n");
+            outputArea.append(ResponseCodes.EMPTY_MESSAGE + " Message content cannot be empty.\n");
             return;
         }
         try {
@@ -127,7 +127,7 @@ public class SMPClientUI extends JFrame {
             String response = clientHelper.upload(username, messageId, message);
             outputArea.append(response + "\n");
         } catch (NumberFormatException e) {
-            outputArea.append(ErrorCodes.INVALID_MESSAGE_ID + " Invalid message ID.\n");
+            outputArea.append(ResponseCodes.INVALID_MESSAGE_ID + " Invalid message ID.\n");
         } catch (IOException ex) {
             outputArea.append("Error: " + ex.getMessage() + "\n");
         }
@@ -135,11 +135,11 @@ public class SMPClientUI extends JFrame {
 
     private void download(String id) {
         if (username == null) {
-            outputArea.append(ErrorCodes.NOT_LOGGED_IN + " Not logged in.\n");
+            outputArea.append(ResponseCodes.NOT_LOGGED_IN + " Not logged in.\n");
             return;
         }
         try {
-            String response = clientHelper.download(id);
+            String response = clientHelper.download(id); // Pass only the message ID
             outputArea.append("Messages from server:\n" + response + "\n");
         } catch (IOException ex) {
             outputArea.append("Error: " + ex.getMessage() + "\n");
@@ -148,7 +148,7 @@ public class SMPClientUI extends JFrame {
 
     private void downloadAll() {
         if (username == null) {
-            outputArea.append(ErrorCodes.NOT_LOGGED_IN + " Not logged in.\n");
+            outputArea.append(ResponseCodes.NOT_LOGGED_IN + " Not logged in.\n");
             return;
         }
         try {
@@ -165,7 +165,7 @@ public class SMPClientUI extends JFrame {
 
     private void clear() {
         if (username == null) {
-            outputArea.append(ErrorCodes.NOT_LOGGED_IN + " Not logged in.\n");
+            outputArea.append(ResponseCodes.NOT_LOGGED_IN + " Not logged in.\n");
             return;
         }
         int confirm = JOptionPane.showConfirmDialog(

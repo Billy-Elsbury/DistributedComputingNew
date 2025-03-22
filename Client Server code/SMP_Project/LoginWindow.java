@@ -104,7 +104,7 @@ public class LoginWindow extends JFrame {
                 mySocket.sendMessage(RequestCodes.LOGIN + " " + username + " " + password);
                 String response = mySocket.receiveMessage();
 
-                if (response.startsWith(String.valueOf(ErrorCodes.SUCCESS))) {
+                if (response.startsWith(String.valueOf(ResponseCodes.SUCCESS))) {
                     ClientHelper clientHelper = new ClientHelper(mySocket); // Pass the existing socket
                     SMPClientUI clientUI = new SMPClientUI(username, clientHelper);
                     clientUI.setVisible(true);
@@ -127,7 +127,7 @@ public class LoginWindow extends JFrame {
 
                 String response = getString(username, password);
 
-                if (response.startsWith(String.valueOf(ErrorCodes.SUCCESS))) {
+                if (response.startsWith(String.valueOf(ResponseCodes.SUCCESS))) {
                     JOptionPane.showMessageDialog(LoginWindow.this, "Registration successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
                 } else {
                     JOptionPane.showMessageDialog(LoginWindow.this, response, "Error", JOptionPane.ERROR_MESSAGE);

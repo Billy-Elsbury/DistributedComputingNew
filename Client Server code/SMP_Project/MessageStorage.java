@@ -104,16 +104,15 @@ public class MessageStorage {
         return ++globalMessageIdCounter;  // Increment and return the global counter
     }
 
-    // Get a specific message by ID for a user
-    public String getMessageById(String username, int messageId) {
-        if (userMessages.containsKey(username)) {
-            for (Message msg : userMessages.get(username)) {
+    public String getMessageById(int messageId) {
+        for (Map.Entry<String, List<Message>> entry : userMessages.entrySet()) {
+            for (Message msg : entry.getValue()) {
                 if (msg.id == messageId) {
-                    return "ID: " + msg.id + " - " + msg.content;
+                    return "User: " + entry.getKey() + " - ID: " + msg.id + " - " + msg.content;
                 }
             }
         }
-        return "Message not found for user: " + username;
+        return null; // Return null if the message is not found
     }
 
     // Get all messages in the file regardless of user or ID

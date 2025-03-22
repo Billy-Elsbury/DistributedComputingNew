@@ -1,5 +1,4 @@
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class SMPClient {
@@ -44,7 +43,7 @@ public class SMPClient {
                         System.out.println("Enter message:");
                         String message = br.readLine();
                         if (message.isEmpty()) {
-                            System.out.println(ErrorCodes.EMPTY_MESSAGE + " Message content cannot be empty.");
+                            System.out.println(ResponseCodes.EMPTY_MESSAGE + " Message content cannot be empty.");
                             break;
                         }
                         System.out.println("Enter message ID (leave blank to auto-generate):");
@@ -70,7 +69,7 @@ public class SMPClient {
                         break;
 
                     default:
-                        System.out.println(ErrorCodes.UNKNOWN_COMMAND + " Unknown command.");
+                        System.out.println(ResponseCodes.UNKNOWN_COMMAND + " Unknown command.");
                         break;
                 }
             }

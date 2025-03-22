@@ -10,4 +10,6 @@ iugjyf:hgf
 ghfg:hgf
 jhkgjfhrgesrdtfhgj:hgyjftrdesda
 uk:ghuj
+Jam:Password
+Badgy:Password
 Peter:Password

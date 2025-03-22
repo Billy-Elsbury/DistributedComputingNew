@@ -19,18 +19,19 @@ public class SMPThread implements Runnable {
             while (!done) {
                 // Receive a message from the client
                 message = myDataSocket.receiveMessage();
-                System.out.println("Message received: " + message);
+                SMPServerUI.getInstance().log("Message received: " + message);
 
                 // Check if the message is null (client disconnected)
                 if (message == null) {
-                    System.out.println("Client disconnected.");
+                    SMPServerUI.getInstance().log("Client disconnected.");
                     break; // Exit the loop and close the thread
                 }
 
                 // Split the message into parts
                 String[] parts = message.split(" ", 4); // Split into at most 4 parts
                 if (parts.length == 0) {
-                    myDataSocket.sendMessage(ErrorCodes.INVALID_COMMAND + " Invalid command format.");
+                    myDataSocket.sendMessage(ResponseCodes.INVALID_COMMAND + " Invalid command format.");
+                    SMPServerUI.getInstance().log("Invalid command format.");
                     continue;
                 }
 
@@ -42,12 +43,15 @@ public class SMPThread implements Runnable {
                             String username = parts[1];
                             String password = parts[2];
                             if (userManager.addUser(username, password)) {
-                                myDataSocket.sendMessage(ErrorCodes.SUCCESS + " Registration successful.");
+                                myDataSocket.sendMessage(ResponseCodes.SUCCESS + " Registration successful.");
+                                SMPServerUI.getInstance().log("User registered: " + username);
                             } else {
-                                myDataSocket.sendMessage(ErrorCodes.INVALID_LOGIN_FORMAT + " Username already exists.");
+                                myDataSocket.sendMessage(ResponseCodes.INVALID_LOGIN_FORMAT + " Username already exists.");
+                                SMPServerUI.getInstance().log("Registration failed: Username already exists.");
                             }
                         } else {
-                            myDataSocket.sendMessage(ErrorCodes.INVALID_LOGIN_FORMAT + " Invalid registration format. Usage: " + RequestCodes.REGISTER + " <username> <password>");
+                            myDataSocket.sendMessage(ResponseCodes.INVALID_LOGIN_FORMAT + " Invalid registration format. Usage: " + RequestCodes.REGISTER + " <username> <password>");
+                            SMPServerUI.getInstance().log("Invalid registration format.");
                         }
                         break;
 
@@ -57,12 +61,15 @@ public class SMPThread implements Runnable {
                             String password = parts[2];
                             if (userManager.verifyUser(username, password)) {
                                 this.username = username;
-                                myDataSocket.sendMessage(ErrorCodes.SUCCESS + " Login successful.");
+                                myDataSocket.sendMessage(ResponseCodes.SUCCESS + " Login successful.");
+                                SMPServerUI.getInstance().log("User logged in: " + username);
                             } else {
-                                myDataSocket.sendMessage(ErrorCodes.NOT_LOGGED_IN + " Login Error in Thread, Invalid username or password.");
+                                myDataSocket.sendMessage(ResponseCodes.NOT_LOGGED_IN + " Login Error in Thread, Invalid username or password.");
+                                SMPServerUI.getInstance().log("Login failed: Invalid username or password.");
                             }
                         } else {
-                            myDataSocket.sendMessage(ErrorCodes.INVALID_LOGIN_FORMAT + " Login Error in Thread, Invalid login format. Usage: " + RequestCodes.LOGIN + " <username> <password>");
+                            myDataSocket.sendMessage(ResponseCodes.INVALID_LOGIN_FORMAT + " Login Error in Thread, Invalid login format. Usage: " + RequestCodes.LOGIN + " <username> <password>");
+                            SMPServerUI.getInstance().log("Invalid login format.");
                         }
                         break;
 
@@ -70,24 +77,30 @@ public class SMPThread implements Runnable {
                         if (parts.length == 4) {
                             String username = parts[1];
                             if (this.username == null || !this.username.equals(username)) {
-                                myDataSocket.sendMessage(ErrorCodes.NOT_LOGGED_IN + " Not logged in.");
+                                myDataSocket.sendMessage(ResponseCodes.NOT_LOGGED_IN + " Not logged in.");
+                                SMPServerUI.getInstance().log("Upload failed: User not logged in.");
                                 break;
                             }
                             try {
                                 int id = Integer.parseInt(parts[2]);
                                 String messageContent = parts[3];
                                 if (messageContent.isEmpty()) {
-                                    myDataSocket.sendMessage(ErrorCodes.EMPTY_MESSAGE + " Message content cannot be empty.");
+                                    myDataSocket.sendMessage(ResponseCodes.EMPTY_MESSAGE + " Message content cannot be empty.");
+                                    SMPServerUI.getInstance().log("Upload failed: Empty message content.");
                                 } else if (messageStorage.addMessage(username, id, messageContent)) {
-                                    myDataSocket.sendMessage(ErrorCodes.SUCCESS + " Message uploaded.");
+                                    myDataSocket.sendMessage(ResponseCodes.SUCCESS + " Message uploaded.");
+                                    SMPServerUI.getInstance().log("Message uploaded by " + username + " with ID: " + id);
                                 } else {
-                                    myDataSocket.sendMessage(ErrorCodes.MESSAGE_ID_EXISTS + " Message ID already exists.");
+                                    myDataSocket.sendMessage(ResponseCodes.MESSAGE_ID_EXISTS + " Message ID already exists.");
+                                    SMPServerUI.getInstance().log("Upload failed: Message ID already exists.");
                                 }
                             } catch (NumberFormatException e) {
-                                myDataSocket.sendMessage(ErrorCodes.INVALID_MESSAGE_ID + " Invalid message ID.");
+                                myDataSocket.sendMessage(ResponseCodes.INVALID_MESSAGE_ID + " Invalid message ID.");
+                                SMPServerUI.getInstance().log("Upload failed: Invalid message ID.");
                             }
                         } else {
-                            myDataSocket.sendMessage(ErrorCodes.INVALID_UPLOAD_FORMAT + " Invalid upload format. Usage: " + RequestCodes.UPLOAD + " <username> <ID> <message>");
+                            myDataSocket.sendMessage(ResponseCodes.INVALID_UPLOAD_FORMAT + " Invalid upload format. Usage: " + RequestCodes.UPLOAD + " <username> <ID> <message>");
+                            SMPServerUI.getInstance().log("Invalid upload format.");
                         }
                         break;
 
@@ -95,24 +108,35 @@ public class SMPThread implements Runnable {
                         List<String> allMessages = messageStorage.getAllMessages();
                         String response = String.join("|", allMessages);  // Join messages with a delimiter
                         myDataSocket.sendMessage(response);
+                        SMPServerUI.getInstance().log("Downloaded all messages for user: " + username);
                         break;
 
                     case RequestCodes.DOWNLOAD:
-                        if (parts.length == 2) {
+                        if (parts.length == 2) { // Expecting format: DOWNLOAD <ID>
                             String input = parts[1];
                             if (input.isEmpty()) {
-                                myDataSocket.sendMessage(ErrorCodes.NO_MESSAGE_ID_PROVIDED + " No message ID provided. Usage: " + RequestCodes.DOWNLOAD + " <ID>");
+                                myDataSocket.sendMessage(ResponseCodes.NO_MESSAGE_ID_PROVIDED + " No message ID provided. Usage: " + RequestCodes.DOWNLOAD + " <ID>");
+                                SMPServerUI.getInstance().log("Download failed: No message ID provided.");
                             } else {
                                 try {
                                     int messageId = Integer.parseInt(input);
-                                    String specificMessage = messageStorage.getMessageById(this.username, messageId);
-                                    myDataSocket.sendMessage(specificMessage);
+                                    // Fetch the message by ID across all users
+                                    String specificMessage = messageStorage.getMessageById(messageId);
+                                    if (specificMessage != null) {
+                                        myDataSocket.sendMessage(ResponseCodes.SUCCESS + " " + specificMessage);
+                                        SMPServerUI.getInstance().log("Downloaded message with ID: " + messageId);
+                                    } else {
+                                        myDataSocket.sendMessage(ResponseCodes.MESSAGE_NOT_FOUND + " Message not found.");
+                                        SMPServerUI.getInstance().log("Download failed: Message not found for ID: " + messageId);
+                                    }
                                 } catch (NumberFormatException e) {
-                                    myDataSocket.sendMessage(ErrorCodes.INVALID_MESSAGE_ID + " Invalid message ID.");
+                                    myDataSocket.sendMessage(ResponseCodes.INVALID_MESSAGE_ID + " Invalid message ID.");
+                                    SMPServerUI.getInstance().log("Download failed: Invalid message ID.");
                                 }
                             }
                         } else {
-                            myDataSocket.sendMessage(ErrorCodes.INVALID_DOWNLOAD_FORMAT + " Invalid download format. Usage: " + RequestCodes.DOWNLOAD + " <ID>");
+                            myDataSocket.sendMessage(ResponseCodes.INVALID_DOWNLOAD_FORMAT + " Invalid download format. Usage: " + RequestCodes.DOWNLOAD + " <ID>");
+                            SMPServerUI.getInstance().log("Invalid download format.");
                         }
                         break;
 
@@ -120,12 +144,15 @@ public class SMPThread implements Runnable {
                         if (parts.length == 1) {
                             try {
                                 messageStorage.clearMessages();
-                                myDataSocket.sendMessage(ErrorCodes.SUCCESS + " All messages cleared.");
+                                myDataSocket.sendMessage(ResponseCodes.SUCCESS + " All messages cleared.");
+                                SMPServerUI.getInstance().log("All messages cleared.");
                             } catch (Exception ex) {
-                                myDataSocket.sendMessage(ErrorCodes.ERROR_CLEARING_MESSAGES + " Error clearing messages.");
+                                myDataSocket.sendMessage(ResponseCodes.ERROR_CLEARING_MESSAGES + " Error clearing messages.");
+                                SMPServerUI.getInstance().log("Error clearing messages: " + ex.getMessage());
                             }
                         } else {
-                            myDataSocket.sendMessage(ErrorCodes.INVALID_CLEAR_FORMAT + " Invalid clear format. Usage: " + RequestCodes.CLEAR);
+                            myDataSocket.sendMessage(ResponseCodes.INVALID_CLEAR_FORMAT + " Invalid clear format. Usage: " + RequestCodes.CLEAR);
+                            SMPServerUI.getInstance().log("Invalid clear format.");
                         }
                         break;
 
@@ -134,25 +161,27 @@ public class SMPThread implements Runnable {
                             String username = parts[1];
                             if (this.username != null && this.username.equals(username)) {
                                 this.username = null;
-                                myDataSocket.sendMessage(ErrorCodes.SUCCESS + " Logoff successful.");
+                                myDataSocket.sendMessage(ResponseCodes.SUCCESS + " Logoff successful.");
+                                SMPServerUI.getInstance().log("User logged off: " + username);
                                 done = true; // Terminate the thread
                             }
                         }
                         break;
 
                     default:
-                        myDataSocket.sendMessage(ErrorCodes.UNKNOWN_COMMAND + " Unknown command.");
+                        myDataSocket.sendMessage(ResponseCodes.UNKNOWN_COMMAND + " Unknown command.");
+                        SMPServerUI.getInstance().log("Unknown command received.");
                         break;
                 }
             }
         } catch (Exception ex) {
-            System.out.println("Exception caught in thread: " + ex);
+            SMPServerUI.getInstance().log("Exception caught in thread: " + ex);
         } finally {
             try {
                 myDataSocket.close(); // Close the socket on exit
-                System.out.println("Socket closed for user: " + username);
+                SMPServerUI.getInstance().log("Socket closed for user: " + username);
             } catch (IOException e) {
-                e.printStackTrace();
+                SMPServerUI.getInstance().log("Error closing socket: " + e.getMessage());
             }
         }
     }
