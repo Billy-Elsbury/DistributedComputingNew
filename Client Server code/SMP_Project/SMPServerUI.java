@@ -6,7 +6,7 @@ import java.util.Date;
 public class SMPServerUI extends JFrame {
     private static SMPServerUI instance;
     private JTextArea logArea;
-    private boolean isInitialized = false; // Flag to track initialization
+    private boolean isInitialised = false;
 
     private SMPServerUI() {
         initializeUI();
@@ -25,11 +25,9 @@ public class SMPServerUI extends JFrame {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Main panel
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // Log area
         logArea = new JTextArea();
         logArea.setEditable(false);
         logArea.setBackground(new Color(30, 30, 30));
@@ -38,24 +36,20 @@ public class SMPServerUI extends JFrame {
         JScrollPane scrollPane = new JScrollPane(logArea);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
 
-        // Add components to the main panel
         mainPanel.add(scrollPane, BorderLayout.CENTER);
-
-        // Add main panel to the frame
         add(mainPanel);
 
-        // Set dark theme
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        isInitialized = true; // Mark the UI as initialized
+        isInitialised = true;
     }
 
     public void log(String message) {
-        if (!isInitialized) {
+        if (!isInitialised) {
             System.err.println("SMPServerUI is not initialized. Cannot log: " + message);
             return;
         }

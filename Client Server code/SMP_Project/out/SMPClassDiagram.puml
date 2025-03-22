@@ -1,0 +1,74 @@
+@startuml
+' Define the layers
+package "Presentation Layer" {
+    class LoginWindow {
+        +handleLogin(username: String, password: String)
+        +handleRegister(username: String, password: String)
+    }
+    class SMPClientUI {
+        +upload(message: String, id: String)
+        +download(id: String)
+        +downloadAll()
+        +logoff()
+    }
+}
+
+package "Application Layer" {
+    class SMPThread {
+        +run()
+        +handleLogin(username: String, password: String)
+        +handleUpload(username: String, id: int, message: String)
+        +handleDownload(id: int)
+        +handleLogoff(username: String)
+    }
+    class MessageStorage {
+        +addMessage(username: String, id: int, message: String): boolean
+        +getMessageById(username: String, id: int): String
+        +getAllMessages(): List<String>
+        +clearMessages()
+    }
+    class UserManager {
+        +addUser(username: String, password: String): boolean
+        +verifyUser(username: String, password: String): boolean
+    }
+}
+
+package "Session Layer" {
+    class MyStreamSocket {
+        +sendMessage(message: String)
+        +receiveMessage(): String
+        +close()
+    }
+    class SSLImplementation {
+        +createSSLSocket(host: String, port: int): SSLSocket
+    }
+}
+
+' Define relationships between layers
+LoginWindow --> SMPThread : sends login/register requests
+SMPClientUI --> SMPThread : sends upload/download/logoff requests
+SMPThread --> MessageStorage : interacts with
+SMPThread --> UserManager : interacts with
+SMPThread --> MyStreamSocket : uses for communication
+MyStreamSocket --> SSLImplementation : uses for secure communication
+
+' Add notes to explain the layers
+note top of LoginWindow
+  Presentation Layer:
+  - Handles user interface and interaction.
+  - Includes LoginWindow and SMPClientUI.
+end note
+
+note top of SMPThread
+  Application Layer:
+  - Contains core business logic.
+  - Includes SMPThread, MessageStorage, and UserManager.
+end note
+
+note top of MyStreamSocket
+  Session Layer:
+  - Manages client-server communication.
+  - Includes MyStreamSocket and SSLImplementation.
+end note
+
+@enduml

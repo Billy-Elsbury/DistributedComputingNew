@@ -105,13 +105,13 @@ public class LoginWindow extends JFrame {
                 String response = mySocket.receiveMessage();
 
                 if (response.startsWith(String.valueOf(ResponseCodes.SUCCESS))) {
-                    ClientHelper clientHelper = new ClientHelper(mySocket); // Pass the existing socket
+                    ClientHelper clientHelper = new ClientHelper(mySocket);
                     SMPClientUI clientUI = new SMPClientUI(username, clientHelper);
                     clientUI.setVisible(true);
                     dispose();
                 } else {
                     JOptionPane.showMessageDialog(LoginWindow.this, response, "Error", JOptionPane.ERROR_MESSAGE);
-                    mySocket.close(); // Close the socket if login fails
+                    mySocket.close();
                 }
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(LoginWindow.this, "Error connecting to the server: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);

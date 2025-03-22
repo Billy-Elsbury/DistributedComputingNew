@@ -32,7 +32,7 @@ public class ClientHelper {
         if (input.equalsIgnoreCase("all")) {
             mySocket.sendMessage(RequestCodes.DOWNLOAD_ALL + "");
         } else {
-            mySocket.sendMessage(RequestCodes.DOWNLOAD + " " + input); // Send only the message ID
+            mySocket.sendMessage(RequestCodes.DOWNLOAD + " " + input);
         }
         return mySocket.receiveMessage();
     }

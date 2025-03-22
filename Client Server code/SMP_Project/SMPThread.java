@@ -3,9 +3,9 @@ import java.util.List;
 
 public class SMPThread implements Runnable {
     private MyStreamSocket myDataSocket;
-    private MessageStorage messageStorage = MessageStorage.getInstance(); // Use the singleton instance
-    private UserManager userManager = new UserManager(); // Add UserManager
-    private String username = null; // Track the username for this session
+    private MessageStorage messageStorage = MessageStorage.getInstance(); //Use singleton instance
+    private UserManager userManager = new UserManager();
+    private String username = null; //username for this session
 
     public SMPThread(MyStreamSocket myDataSocket) {
         this.myDataSocket = myDataSocket;
@@ -17,18 +17,17 @@ public class SMPThread implements Runnable {
 
         try {
             while (!done) {
-                // Receive a message from the client
                 message = myDataSocket.receiveMessage();
                 SMPServerUI.getInstance().log("Message received: " + message);
 
-                // Check if the message is null (client disconnected)
+                //if the message is null (client disconnected)
                 if (message == null) {
                     SMPServerUI.getInstance().log("Client disconnected.");
-                    break; // Exit the loop and close the thread
+                    break;
                 }
 
-                // Split the message into parts
-                String[] parts = message.split(" ", 4); // Split into at most 4 parts
+                // Split message into parts
+                String[] parts = message.split(" ", 4);
                 if (parts.length == 0) {
                     myDataSocket.sendMessage(ResponseCodes.INVALID_COMMAND + " Invalid command format.");
                     SMPServerUI.getInstance().log("Invalid command format.");
@@ -106,13 +105,13 @@ public class SMPThread implements Runnable {
 
                     case RequestCodes.DOWNLOAD_ALL:
                         List<String> allMessages = messageStorage.getAllMessages();
-                        String response = String.join("|", allMessages);  // Join messages with a delimiter
+                        String response = String.join("|", allMessages);  //Join messages with delimiter
                         myDataSocket.sendMessage(response);
                         SMPServerUI.getInstance().log("Downloaded all messages for user: " + username);
                         break;
 
                     case RequestCodes.DOWNLOAD:
-                        if (parts.length == 2) { // Expecting format: DOWNLOAD <ID>
+                        if (parts.length == 2) {
                             String input = parts[1];
                             if (input.isEmpty()) {
                                 myDataSocket.sendMessage(ResponseCodes.NO_MESSAGE_ID_PROVIDED + " No message ID provided. Usage: " + RequestCodes.DOWNLOAD + " <ID>");
@@ -120,7 +119,6 @@ public class SMPThread implements Runnable {
                             } else {
                                 try {
                                     int messageId = Integer.parseInt(input);
-                                    // Fetch the message by ID across all users
                                     String specificMessage = messageStorage.getMessageById(messageId);
                                     if (specificMessage != null) {
                                         myDataSocket.sendMessage(ResponseCodes.SUCCESS + " " + specificMessage);
@@ -163,7 +161,7 @@ public class SMPThread implements Runnable {
                                 this.username = null;
                                 myDataSocket.sendMessage(ResponseCodes.SUCCESS + " Logoff successful.");
                                 SMPServerUI.getInstance().log("User logged off: " + username);
-                                done = true; // Terminate the thread
+                                done = true;
                             }
                         }
                         break;
@@ -178,7 +176,7 @@ public class SMPThread implements Runnable {
             SMPServerUI.getInstance().log("Exception caught in thread: " + ex);
         } finally {
             try {
-                myDataSocket.close(); // Close the socket on exit
+                myDataSocket.close();
                 SMPServerUI.getInstance().log("Socket closed for user: " + username);
             } catch (IOException e) {
                 SMPServerUI.getInstance().log("Error closing socket: " + e.getMessage());

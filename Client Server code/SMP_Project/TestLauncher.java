@@ -2,43 +2,42 @@ import javax.swing.*;
 import java.util.concurrent.CountDownLatch;
 
 public class TestLauncher {
-    private static final CountDownLatch uiReadyLatch = new CountDownLatch(1); // Latch to ensure UI is ready
+    private static final CountDownLatch uiReadyLatch = new CountDownLatch(1); //Latch to ensure UI is ready
 
     public static void main(String[] args) {
         System.setProperty("javax.net.ssl.trustStore", "clientTruststore.jks");
         System.setProperty("javax.net.ssl.trustStorePassword", "password");
 
-        // Launch the SMPServerUI for debugging
+        //SMPServerUI for debugging
         SwingUtilities.invokeLater(() -> {
             try {
                 SMPServerUI serverUI = SMPServerUI.getInstance();
-                serverUI.setVisible(true); // Ensure the UI is visible
-                uiReadyLatch.countDown(); // Signal that the UI is ready
+                serverUI.setVisible(true);
+                uiReadyLatch.countDown(); //Signal UI is ready
             } catch (Exception e) {
                 e.printStackTrace();
                 System.err.println("Failed to initialize SMPServerUI: " + e.getMessage());
             }
         });
 
-        // Wait for the UI to be fully initialized
+        //Wait for UI to be initialised
         try {
-            uiReadyLatch.await(); // Block until the UI is ready
+            uiReadyLatch.await(); //Blocking until UI is ready
         } catch (InterruptedException e) {
             e.printStackTrace();
             System.err.println("UI initialization was interrupted: " + e.getMessage());
         }
 
-        // Launch the server in a new thread
+        //server in a new thread
         new Thread(() -> SMPServer.main(new String[]{})).start();
 
-        // Wait for the server to start
         try {
-            Thread.sleep(2000); // Give the server time to initialize
+            Thread.sleep(2000); // couple seconds for server to initialise
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
-        // Launch login windows for testing
+        //Launch any number of login windows
         launchLoginWindow();
         launchLoginWindow();
     }

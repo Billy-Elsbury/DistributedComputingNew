@@ -19,7 +19,6 @@ public class SMPClientUI extends JFrame {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Set dark mode colors
         getContentPane().setBackground(new Color(30, 30, 30));
         setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
