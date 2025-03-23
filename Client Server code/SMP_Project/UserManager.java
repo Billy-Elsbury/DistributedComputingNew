@@ -2,6 +2,7 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
+//Handles basic user authentication and registration
 public class UserManager {
     private static final String USER_FILE = "users.txt"; //Store user credentials
     private Map<String, String> users; //Map for username password pairs

@@ -3,6 +3,7 @@ import java.awt.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+//Interface for server logs and debugging.
 public class SMPServerUI extends JFrame {
     private static SMPServerUI instance;
     private JTextArea logArea;

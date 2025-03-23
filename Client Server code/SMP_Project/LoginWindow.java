@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
 
+//Handles user login and registration.
 public class LoginWindow extends JFrame {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {

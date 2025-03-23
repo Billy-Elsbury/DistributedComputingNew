@@ -22,7 +22,7 @@ package "Application Layer" {
         +handleLogoff(username: String)
     }
     class MessageStorage {
-        +addMessage(username: String, id: int, message: String): boolean
+        +uploadMessage(username: String, id: int, message: String): boolean
         +getMessageById(username: String, id: int): String
         +getAllMessages(): List<String>
         +clearMessages()

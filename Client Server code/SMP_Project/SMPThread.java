@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.util.List;
 
+//Handles client requests on the server side.
 public class SMPThread implements Runnable {
     private MyStreamSocket myDataSocket;
     private MessageStorage messageStorage = MessageStorage.getInstance(); //Use singleton instance
@@ -86,7 +87,7 @@ public class SMPThread implements Runnable {
                                 if (messageContent.isEmpty()) {
                                     myDataSocket.sendMessage(ResponseCodes.EMPTY_MESSAGE + " Message content cannot be empty.");
                                     SMPServerUI.getInstance().log("Upload failed: Empty message content.");
-                                } else if (messageStorage.addMessage(username, id, messageContent)) {
+                                } else if (messageStorage.uploadMessage(username, id, messageContent)) {
                                     myDataSocket.sendMessage(ResponseCodes.SUCCESS + " Message uploaded.");
                                     SMPServerUI.getInstance().log("Message uploaded by " + username + " with ID: " + id);
                                 } else {

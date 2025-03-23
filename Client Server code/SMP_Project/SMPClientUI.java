@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
 
+//Main Interface for message management.
 public class SMPClientUI extends JFrame {
     private String username;
     private final ClientHelper clientHelper;

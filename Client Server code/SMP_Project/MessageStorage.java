@@ -1,6 +1,7 @@
 import java.io.*;
 import java.util.*;
 
+//Manages the storage and retrieval of messages.
 public class MessageStorage {
     // Singleton instance
     private static MessageStorage instance;
@@ -72,7 +73,7 @@ public class MessageStorage {
         }
     }
 
-    public synchronized boolean addMessage(String username, int id, String message) {
+    public synchronized boolean uploadMessage(String username, int id, String message) {
         userMessages.putIfAbsent(username, new ArrayList<>());
 
         //If ID not provided auto generate next available ID
@@ -95,7 +96,7 @@ public class MessageStorage {
     }
 
     private int getNextAvailableId() {
-        return ++globalMessageIdCounter;  // Increment and return the global counter
+        return ++globalMessageIdCounter;  //Increment and return global counter
     }
 
     public String getMessageById(int messageId) {

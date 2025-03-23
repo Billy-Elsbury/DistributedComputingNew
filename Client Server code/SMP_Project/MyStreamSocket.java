@@ -1,6 +1,7 @@
 import java.net.*;
 import java.io.*;
 
+//Wraps TCP sockets for easier communication.
 public class MyStreamSocket extends Socket {
    private Socket socket;
    private BufferedReader input;
