@@ -1,0 +1,21 @@
+@startuml Application_Layer_Sequence
+participant "SMPThread" as Thread
+participant "UserManager" as UserMgr
+participant "MessageStorage" as Storage
+
+Thread -> UserMgr : verifyUser(username, password)
+UserMgr --> Thread : Success/Failure
+Thread -> Storage : uploadMessage(username, id, message)
+Storage --> Thread : Success/Failure
+Thread -> Storage : getMessageById(id)
+Storage --> Thread : Message/Error
+Thread -> Storage : getAllMessages()
+Storage --> Thread : List<String>
+Thread -> UserMgr : logoff(username)
+
+note right of Thread
+  **Application Layer**:
+  - Manages core logic (login, upload, download).
+  - Interacts with Service Layer for communication.
+end note
+@enduml

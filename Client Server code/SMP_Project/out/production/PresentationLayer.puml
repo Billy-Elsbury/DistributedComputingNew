@@ -1,0 +1,33 @@
+@startuml Presentation_Layer
+package "Presentation Layer" {
+  class LoginWindow {
+    +handleLogin(username: String, password: String)
+    +handleRegister(username: String, password: String)
+  }
+
+  class SMPClientUI {
+    +upload(message: String, id: String)
+    +download(id: String)
+    +downloadAll()
+    +logoff()
+  }
+
+  class SMPServerUI {
+    -logArea: JTextArea
+    -isInitialised: boolean
+    +log(message: String)
+    +getInstance(): SMPServerUI
+  }
+}
+
+' Relationships
+LoginWindow --> SMPClientUI : switches to after login
+SMPServerUI ..> SMPThread : listens to server logs
+
+note top of LoginWindow
+  **Presentation Layer**:
+  - Client: LoginWindow, SMPClientUI (user-facing).
+  - Server: SMPServerUI (debug logs).
+  - SMPServerUI is a singleton for centralized logging.
+end note
+@enduml

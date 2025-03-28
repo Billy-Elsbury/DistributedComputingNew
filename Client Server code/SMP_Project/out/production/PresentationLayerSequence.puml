@@ -1,0 +1,36 @@
+@startuml Presentation_Layer_Sequence
+actor User
+participant "LoginWindow" as Login
+participant "SMPClientUI" as ClientUI
+participant "SMPServerUI" as ServerUI
+
+User -> Login : handleLogin("Billy", "password")
+activate Login
+Login -> ClientUI : showMainInterface()
+deactivate Login
+
+User -> ClientUI : upload("Hello", "1")
+activate ClientUI
+ClientUI -> ServerUI : log("Upload request: ID=1")
+ServerUI --> ClientUI : [Logged]
+deactivate ClientUI
+
+User -> ClientUI : downloadAll()
+activate ClientUI
+ClientUI -> ServerUI : log("Download all request")
+ServerUI --> ClientUI : [Logged]
+deactivate ClientUI
+
+User -> ClientUI : logoff()
+activate ClientUI
+ClientUI -> ServerUI : log("User Billy logged off")
+ServerUI --> ClientUI : [Logged]
+deactivate ClientUI
+
+note right of User
+  **Key Flows**:
+  1. SMPServerUI logs server-side events.
+  2. Client UIs remain decoupled from logging.
+  3. Singleton pattern ensures one logging instance.
+end note
+@enduml

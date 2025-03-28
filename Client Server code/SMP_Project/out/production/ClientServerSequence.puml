@@ -1,0 +1,62 @@
+@startuml SMP_Simplified_Sequence
+actor User
+participant "Client" as client
+participant "Server" as server
+
+== Login ==
+User -> client : Enters username/password
+client -> server : "100:username,password"
+alt Success
+    server --> client : "101:Login Successful"
+    client -> User : Shows success
+else Failure
+    server --> client : "102:Login Failed"
+    client -> User : Shows error
+end
+
+== Upload Message ==
+User -> client : Enters message
+client -> server : "300:Hello World"
+alt Success
+    server --> client : "301:Upload Successful"
+    client -> User : Confirms upload
+else Failure
+    server --> client : "302:Unable to upload"
+    client -> User : Shows error
+end
+
+== Download Message ==
+User -> client : Requests message (ID=1)
+client -> server : "400:1"
+alt Found
+    server --> client : "401:Hello World"
+    client -> User : Displays message
+else Not Found
+    server --> client : "402:Not found"
+    client -> User : Shows error
+end
+
+== Download All ==
+User -> client : Requests all messages
+client -> server : "500:"
+alt Success
+    server --> client : "501:msg1|msg2|msg3"
+    client -> User : Displays messages
+else Error
+    server --> client : "502:Error"
+    client -> User : Shows error
+end
+
+== Logoff ==
+User -> client : Clicks logoff
+client -> server : "200:"
+server --> client : "201:Logout Successful"
+client -> User : Returns to login
+
+note right of server
+  **Protocol Notes**:
+  - All messages are text-based
+  - First 3 digits = request code
+  - Spaces separates code from content
+end note
+@enduml

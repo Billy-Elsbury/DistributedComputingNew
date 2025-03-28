@@ -1,0 +1,31 @@
+@startuml Application_Layer
+package "Application Layer" {
+    class SMPThread {
+        +run()
+        +handleLogin(username: String, password: String)
+        +handleUpload(username: String, id: int, message: String)
+        +handleDownload(id: int)
+        +handleLogoff(username: String)
+    }
+    class MessageStorage {
+        +uploadMessage(username: String, id: int, message: String): boolean
+        +getMessageById(username: String, id: int): String
+        +getAllMessages(): List<String>
+        +clearMessages()
+    }
+    class UserManager {
+        +addUser(username: String, password: String): boolean
+        +verifyUser(username: String, password: String): boolean
+    }
+}
+
+note top of SMPThread
+  Application Layer:
+  - Contains core business logic.
+  - Includes SMPThread, MessageStorage, and UserManager.
+end note
+
+' Relationships within the Application Layer
+SMPThread --> MessageStorage : interacts with
+SMPThread --> UserManager : interacts with
+@enduml
