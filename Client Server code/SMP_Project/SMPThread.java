@@ -56,18 +56,25 @@ public class SMPThread implements Runnable {
                         break;
 
                     case RequestCodes.LOGIN:
-                        if (parts.length == 3) {
+                        if (parts.length == 3)
+                        {
                             String username = parts[1];
                             String password = parts[2];
-                            if (userManager.verifyUser(username, password)) {
+
+                            if (userManager.verifyUser(username, password))
+                            {
                                 this.username = username;
                                 myDataSocket.sendMessage(ResponseCodes.SUCCESS + " Login successful.");
                                 SMPServerUI.getInstance().log("User logged in: " + username);
-                            } else {
+                            }
+                            else
+                            {
                                 myDataSocket.sendMessage(ResponseCodes.NOT_LOGGED_IN + " Login Error in Thread, Invalid username or password.");
                                 SMPServerUI.getInstance().log("Login failed: Invalid username or password.");
                             }
-                        } else {
+                        }
+                        else
+                        {
                             myDataSocket.sendMessage(ResponseCodes.INVALID_LOGIN_FORMAT + " Login Error in Thread, Invalid login format. Usage: " + RequestCodes.LOGIN + " <username> <password>");
                             SMPServerUI.getInstance().log("Invalid login format.");
                         }
@@ -76,7 +83,8 @@ public class SMPThread implements Runnable {
                     case RequestCodes.UPLOAD:
                         if (parts.length == 4) {
                             String username = parts[1];
-                            if (this.username == null || !this.username.equals(username)) {
+                            if (this.username == null || !this.username.equals(username))
+                            {
                                 myDataSocket.sendMessage(ResponseCodes.NOT_LOGGED_IN + " Not logged in.");
                                 SMPServerUI.getInstance().log("Upload failed: User not logged in.");
                                 break;
@@ -84,13 +92,18 @@ public class SMPThread implements Runnable {
                             try {
                                 int id = Integer.parseInt(parts[2]);
                                 String messageContent = parts[3];
-                                if (messageContent.isEmpty()) {
+                                if (messageContent.isEmpty())
+                                {
                                     myDataSocket.sendMessage(ResponseCodes.EMPTY_MESSAGE + " Message content cannot be empty.");
                                     SMPServerUI.getInstance().log("Upload failed: Empty message content.");
-                                } else if (messageStorage.uploadMessage(username, id, messageContent)) {
+                                }
+                                else if (messageStorage.uploadMessage(username, id, messageContent))
+                                {
                                     myDataSocket.sendMessage(ResponseCodes.SUCCESS + " Message uploaded.");
                                     SMPServerUI.getInstance().log("Message uploaded by " + username + " with ID: " + id);
-                                } else {
+                                }
+                                else
+                                {
                                     myDataSocket.sendMessage(ResponseCodes.MESSAGE_ID_EXISTS + " Message ID already exists.");
                                     SMPServerUI.getInstance().log("Upload failed: Message ID already exists.");
                                 }
@@ -106,7 +119,7 @@ public class SMPThread implements Runnable {
 
                     case RequestCodes.DOWNLOAD_ALL:
                         List<String> allMessages = messageStorage.getAllMessages();
-                        String response = String.join("|", allMessages);  //Join messages with delimiter
+                        String response = String.join("|", allMessages);  //Join messages with delimiter for UI formatting
                         myDataSocket.sendMessage(response);
                         SMPServerUI.getInstance().log("Downloaded all messages for user: " + username);
                         break;
@@ -117,39 +130,52 @@ public class SMPThread implements Runnable {
                             if (input.isEmpty()) {
                                 myDataSocket.sendMessage(ResponseCodes.NO_MESSAGE_ID_PROVIDED + " No message ID provided. Usage: " + RequestCodes.DOWNLOAD + " <ID>");
                                 SMPServerUI.getInstance().log("Download failed: No message ID provided.");
-                            } else {
+                            }
+                            else
+                            {
                                 try {
                                     int messageId = Integer.parseInt(input);
                                     String specificMessage = messageStorage.getMessageById(messageId);
-                                    if (specificMessage != null) {
+
+                                    if (specificMessage != null)
+                                    {
                                         myDataSocket.sendMessage(ResponseCodes.SUCCESS + " " + specificMessage);
                                         SMPServerUI.getInstance().log("Downloaded message with ID: " + messageId);
-                                    } else {
+                                    }
+                                    else
+                                    {
                                         myDataSocket.sendMessage(ResponseCodes.MESSAGE_NOT_FOUND + " Message not found.");
                                         SMPServerUI.getInstance().log("Download failed: Message not found for ID: " + messageId);
                                     }
-                                } catch (NumberFormatException e) {
+                                } catch (NumberFormatException e)
+                                {
                                     myDataSocket.sendMessage(ResponseCodes.INVALID_MESSAGE_ID + " Invalid message ID.");
                                     SMPServerUI.getInstance().log("Download failed: Invalid message ID.");
                                 }
                             }
-                        } else {
+                        } else
+                        {
                             myDataSocket.sendMessage(ResponseCodes.INVALID_DOWNLOAD_FORMAT + " Invalid download format. Usage: " + RequestCodes.DOWNLOAD + " <ID>");
                             SMPServerUI.getInstance().log("Invalid download format.");
                         }
                         break;
 
                     case RequestCodes.CLEAR:
-                        if (parts.length == 1) {
-                            try {
+                        if (parts.length == 1)
+                        {
+                            try
+                            {
                                 messageStorage.clearMessages();
                                 myDataSocket.sendMessage(ResponseCodes.SUCCESS + " All messages cleared.");
                                 SMPServerUI.getInstance().log("All messages cleared.");
-                            } catch (Exception ex) {
+                            }
+                            catch (Exception ex)
+                            {
                                 myDataSocket.sendMessage(ResponseCodes.ERROR_CLEARING_MESSAGES + " Error clearing messages.");
                                 SMPServerUI.getInstance().log("Error clearing messages: " + ex.getMessage());
                             }
-                        } else {
+                        } else
+                        {
                             myDataSocket.sendMessage(ResponseCodes.INVALID_CLEAR_FORMAT + " Invalid clear format. Usage: " + RequestCodes.CLEAR);
                             SMPServerUI.getInstance().log("Invalid clear format.");
                         }

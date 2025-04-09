@@ -1,31 +1,54 @@
-@startuml Application_Layer
+@startuml Application_Layer_With_ClientHelper
+
 package "Application Layer" {
-    class SMPThread {
-        +run()
-        +handleLogin(username: String, password: String)
-        +handleUpload(username: String, id: int, message: String)
-        +handleDownload(id: int)
-        +handleLogoff(username: String)
+
+    class SMPServer {
+       + {static} main(args: String[])
+       ' Listens for connections and starts SMPThreads
     }
-    class MessageStorage {
-        +uploadMessage(username: String, id: int, message: String): boolean
-        +getMessageById(username: String, id: int): String
-        +getAllMessages(): List<String>
-        +clearMessages()
+
+   class SMPThread {
+               +run()
+               +handleLogin(username: String, password: String)
+               +handleUpload(username: String, id: int, message: String)
+               +handleDownload(id: int)
+               +handleLogoff(username: String)
+           }
+
+    class MessageStorage <<Singleton>> {
+    ' Added Singleton based on code
+        + {static} getInstance(): MessageStorage
+        + uploadMessage(username: String, id: int, message: String): boolean
+        + getMessageById(id: int): String
+        + getAllMessages(): List<String>
+        + clearMessages()
     }
+
     class UserManager {
-        +addUser(username: String, password: String): boolean
-        +verifyUser(username: String, password: String): boolean
+        + addUser(username: String, password: String): boolean
+        + verifyUser(username: String, password: String): boolean
+        ' + logoff(username: String): void
     }
+
+    class ClientHelper {
+    ' <-- Moved ClientHelper here
+         + ClientHelper(hostName: String, port: int)
+         + login(user: String, pass: String): String
+         + upload(user: String, id: int, msg: String): String
+         + download(id: String): String
+         + clear(): String
+         + logoff(user: String): String
+         + close()
+
+    }
+
+
+    ' --- Relationships within the Application Layer ---
+    SMPServer ..> SMPThread : <<creates>>
+    SMPThread ---> MessageStorage : uses >
+    SMPThread ---> UserManager : uses >
+
+
 }
 
-note top of SMPThread
-  Application Layer:
-  - Contains core business logic.
-  - Includes SMPThread, MessageStorage, and UserManager.
-end note
-
-' Relationships within the Application Layer
-SMPThread --> MessageStorage : interacts with
-SMPThread --> UserManager : interacts with
 @enduml

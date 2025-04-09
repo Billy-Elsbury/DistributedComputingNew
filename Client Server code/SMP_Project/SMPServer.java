@@ -3,8 +3,10 @@ import javax.net.ssl.SSLServerSocketFactory;
 import java.io.FileInputStream;
 import java.util.Properties;
 
-public class SMPServer {
-    public static void main(String[] args) {
+public class SMPServer
+{
+    public static void main(String[] args)
+    {
         int serverPort = 12345;  //Default port
         if (args.length == 1) {
             serverPort = Integer.parseInt(args[0]);
@@ -12,9 +14,12 @@ public class SMPServer {
 
         //properties from config file
         Properties props = new Properties();
-        try (FileInputStream fis = new FileInputStream("config.properties")) {
+        try (FileInputStream fis = new FileInputStream("config.properties"))
+        {
             props.load(fis);
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             System.err.println("Failed to load config.properties");
             ex.printStackTrace();
             return;
@@ -32,7 +37,8 @@ public class SMPServer {
 
             SMPServerUI.getInstance().log("SMP Server (SSL) ready on port " + serverPort);
 
-            while (true) {
+            while (true)
+            {
                 SMPServerUI.getInstance().log("Waiting for a connection...");
                 MyStreamSocket myDataSocket = new MyStreamSocket(sslServerSocket.accept());
                 SMPServerUI.getInstance().log("Connection accepted.");
@@ -40,7 +46,9 @@ public class SMPServer {
                 Thread theThread = new Thread(new SMPThread(myDataSocket));
                 theThread.start();
             }
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             SMPServerUI.getInstance().log("Exception: " + ex.getMessage());
             ex.printStackTrace();
         }

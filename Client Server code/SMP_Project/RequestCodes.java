@@ -1,4 +1,5 @@
-public class RequestCodes {
+public class RequestCodes
+{
     public static final int LOGIN = 201;
     public static final int UPLOAD = 202;
     public static final int DOWNLOAD = 203;

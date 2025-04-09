@@ -14,7 +14,8 @@ public class SMPServerUI extends JFrame {
     }
 
     public static SMPServerUI getInstance() {
-        if (instance == null) {
+        if (instance == null)
+        {
             instance = new SMPServerUI();
         }
         return instance;
@@ -50,18 +51,22 @@ public class SMPServerUI extends JFrame {
     }
 
     public void log(String message) {
-        if (!isInitialised) {
+        if (!isInitialised)
+        {
             System.err.println("SMPServerUI is not initialized. Cannot log: " + message);
             return;
         }
 
         SwingUtilities.invokeLater(() -> {
-            try {
+            try
+            {
                 String timestamp = new SimpleDateFormat("HH:mm:ss").format(new Date());
                 String logMessage = "[" + timestamp + "] " + message + "\n";
                 logArea.append(logMessage);
                 logArea.setCaretPosition(logArea.getDocument().getLength()); // Auto-scroll to the bottom
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 e.printStackTrace();
                 System.err.println("Failed to update SMPServerUI: " + e.getMessage());
             }

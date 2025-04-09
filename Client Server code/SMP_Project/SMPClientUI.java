@@ -134,20 +134,24 @@ public class SMPClientUI extends JFrame {
     }
 
     private void download(String id) {
-        if (username == null) {
+        if (username == null)
+        {
             outputArea.append(ResponseCodes.NOT_LOGGED_IN + " Not logged in.\n");
             return;
         }
         try {
             String response = clientHelper.download(id); // Pass only the message ID
             outputArea.append("Messages from server:\n" + response + "\n");
-        } catch (IOException ex) {
+        }
+        catch (IOException ex)
+        {
             outputArea.append("Error: " + ex.getMessage() + "\n");
         }
     }
 
     private void downloadAll() {
-        if (username == null) {
+        if (username == null)
+        {
             outputArea.append(ResponseCodes.NOT_LOGGED_IN + " Not logged in.\n");
             return;
         }
@@ -155,16 +159,20 @@ public class SMPClientUI extends JFrame {
             String response = clientHelper.download("all");
             String[] messages = response.split("\\|");
             outputArea.setText("");
-            for (String message : messages) {
+            for (String message : messages)
+            {
                 outputArea.append(message + "\n");
             }
-        } catch (IOException ex) {
+        }
+        catch (IOException ex)
+        {
             outputArea.append("Error: " + ex.getMessage() + "\n");
         }
     }
 
     private void clear() {
-        if (username == null) {
+        if (username == null)
+        {
             outputArea.append(ResponseCodes.NOT_LOGGED_IN + " Not logged in.\n");
             return;
         }
@@ -174,11 +182,15 @@ public class SMPClientUI extends JFrame {
                 "Confirm Clear",
                 JOptionPane.YES_NO_OPTION
         );
-        if (confirm == JOptionPane.YES_OPTION) {
-            try {
+        if (confirm == JOptionPane.YES_OPTION)
+        {
+            try
+            {
                 String result = clientHelper.clear();
                 outputArea.append(result + "\n");
-            } catch (IOException ex) {
+            }
+            catch (IOException ex)
+            {
                 outputArea.append("Error: " + ex.getMessage() + "\n");
             }
         }
@@ -187,8 +199,8 @@ public class SMPClientUI extends JFrame {
     private void logoff() {
         if (username == null) return;
 
-        try {
-            // Send LOGOFF command instead of reusing login
+        try
+        {
             String response = clientHelper.logoff(username);
             outputArea.append(response + "\n");
             clientHelper.close();
@@ -196,7 +208,9 @@ public class SMPClientUI extends JFrame {
             dispose();
 
             SwingUtilities.invokeLater(() -> new LoginWindow().setVisible(true));
-        } catch (IOException ex) {
+        }
+        catch (IOException ex)
+        {
             outputArea.append("Logoff error: " + ex.getMessage() + "\n");
         }
     }

@@ -1,83 +1,77 @@
-@startuml SMP_Complete_UML
-' Layers
+@startuml SMP_Application_Adapted_No_Inline_Comments
+
 package "Presentation Layer" {
-    class LoginWindow {
-        +handleLogin(username: String, password: String)
-        +handleRegister(username: String, password: String)
-    }
-    class SMPClientUI {
-        +upload(message: String, id: String)
-        +download(id: String)
-        +downloadAll()
-        +logoff()
-    }
-    class SMPServerUI {
-        -logArea: JTextArea
-        -isInitialised: boolean
-        +log(message: String)
-        +getInstance(): SMPServerUI
-    }
+  class LoginWindow {
+    + handleLogin(username: String, password: String)
+    + handleRegister(username: String, password: String)
+  }
+  class SMPClientUI {
+    + upload(message: String, id: String)
+    + download(id: String)
+    + downloadAll()
+    + clear()
+    + logoff()
+  }
+  class SMPServerUI {
+    - logArea: JTextArea
+    - isInitialised: boolean
+    + {static} getInstance(): SMPServerUI
+    + log(message: String)
+  }
 }
 
 package "Application Layer" {
-    class SMPThread {
-        +run()
-        +handleLogin(username: String, password: String)
-        +handleUpload(username: String, id: int, message: String)
-        +handleDownload(id: int)
-        +handleLogoff(username: String)
-    }
-    class MessageStorage {
-        +uploadMessage(username: String, id: int, message: String): boolean
-        +getMessageById(username: String, id: int): String
-        +getAllMessages(): List<String>
-        +clearMessages()
-    }
-    class UserManager {
-        +addUser(username: String, password: String): boolean
-        +verifyUser(username: String, password: String): boolean
-    }
+  class ClientHelper {
+     + ClientHelper(hostName: String, port: int)
+     + login(user: String, pass: String): String
+     + upload(user: String, id: int, msg: String): String
+     + download(id: String): String
+     + clear(): String
+     + logoff(user: String): String
+     + close()
+  }
+  class SMPThread {
+    + run()
+    + handleLogin(username: String, password: String)
+    + handleUpload(username: String, id: int, message: String)
+    + handleDownload(id: int)
+    + handleLogoff(username: String)
+  }
+  class SMPServer {
+    + {static} main(args: String[])
+  }
+  class MessageStorage {
+    + {static} getInstance(): MessageStorage
+    + uploadMessage(username: String, id: int, message: String): boolean
+    + getMessageById(id: int): String
+    + getAllMessages(): List<String>
+    + clearMessages()
+  }
+  class UserManager {
+    + addUser(username: String, password: String): boolean
+    + verifyUser(username: String, password: String): boolean
+  }
 }
 
 package "Service Layer" {
-    class MyStreamSocket {
-        +sendMessage(message: String)
-        +receiveMessage(): String
-        +close()
-    }
-    class SSLImplementation {
-        +createSSLSocket(host: String, port: int): SSLSocket
-    }
+  class MyStreamSocket {
+    + MyStreamSocket(socket: Socket)
+    + sendMessage(message: String)
+    + receiveMessage(): String
+    + close()
+  }
 }
 
-' Relationships
-LoginWindow --> SMPThread : sends login/register requests
-SMPClientUI --> SMPThread : sends upload/download/logoff requests
-SMPThread --> SMPServerUI : logs server events
-SMPThread --> MessageStorage : interacts with
-SMPThread --> UserManager : interacts with
-SMPThread --> MyStreamSocket : uses for communication
-MyStreamSocket --> SSLImplementation : uses for secure communication
+' Define Relationships
+LoginWindow ---> ClientHelper : uses >
+SMPClientUI ---> ClientHelper : uses >
+SMPThread --> MyStreamSocket : uses > ' Server-side socket usage
+ClientHelper ..> MyStreamSocket : <<creates & uses>> ' Client-side socket usage
+SMPThread --> MessageStorage : uses >
+SMPThread --> UserManager : uses >
+SMPThread --> SMPServerUI : logs > ' Per-thread logging
+SMPServer ..> SMPThread : <<creates>>
+SMPServer --> SMPServerUI : logs > ' Server startup logging
 
-' Notes
-note top of LoginWindow
-  Presentation Layer:
-  - Client UI: LoginWindow, SMPClientUI.
-  - Server UI: SMPServerUI (debug logs).
-  - SMPServerUI is a singleton.
-end note
-
-note top of SMPThread
-  Application Layer:
-  - Core business logic.
-  - SMPThread logs to SMPServerUI.
-  - Manages MessageStorage and UserManager.
-end note
-
-note top of MyStreamSocket
-  Service Layer:
-  - Handles secure communication.
-  - Uses SSLImplementation for encryption.
-end note
 
 @enduml

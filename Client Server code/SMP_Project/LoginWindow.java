@@ -111,11 +111,14 @@ public class LoginWindow extends JFrame {
                     clientUI.setVisible(true);
                     dispose();
                 } else {
-                    JOptionPane.showMessageDialog(LoginWindow.this, response, "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(LoginWindow.this,
+                            response, "Error", JOptionPane.ERROR_MESSAGE);
                     mySocket.close();
                 }
             } catch (IOException ex) {
-                JOptionPane.showMessageDialog(LoginWindow.this, "Error connecting to the server: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(LoginWindow.this,
+                        "Error connecting to the server: " + ex.getMessage(),
+                        "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
@@ -129,15 +132,22 @@ public class LoginWindow extends JFrame {
                 String response = getString(username, password);
 
                 if (response.startsWith(String.valueOf(ResponseCodes.SUCCESS))) {
-                    JOptionPane.showMessageDialog(LoginWindow.this, "Registration successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(LoginWindow.this,
+                            "Registration successful!",
+                            "Success", JOptionPane.INFORMATION_MESSAGE);
                 } else {
-                    JOptionPane.showMessageDialog(LoginWindow.this, response, "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(LoginWindow.this, response,
+                            "Error", JOptionPane.ERROR_MESSAGE);
                 }
             } catch (IOException ex) {
-                JOptionPane.showMessageDialog(LoginWindow.this, "Error connecting to the server: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(LoginWindow.this,
+                        "Error connecting to the server: " + ex.getMessage(),
+                        "Error", JOptionPane.ERROR_MESSAGE);
             }
         } else {
-            JOptionPane.showMessageDialog(LoginWindow.this, "Please enter a username and password.", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(LoginWindow.this,
+                    "Please enter a username and password.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 

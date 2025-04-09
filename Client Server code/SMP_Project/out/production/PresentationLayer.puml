@@ -1,33 +1,40 @@
-@startuml Presentation_Layer
+@startuml Presentation_Layer_Without_Helper
+
 package "Presentation Layer" {
+
+  ' --- Client-Side UI Components ---
   class LoginWindow {
-    +handleLogin(username: String, password: String)
-    +handleRegister(username: String, password: String)
+    + handleLogin(username: String, password: String)
+    + handleRegister(username: String, password: String)
+    ' After successful login, shows SMPClientUI
+    ' Calls ClientHelper (defined elsewhere)
   }
 
   class SMPClientUI {
-    +upload(message: String, id: String)
-    +download(id: String)
-    +downloadAll()
-    +logoff()
+    + upload(message: String, id: String)
+    + download(id: String)
+    + downloadAll()
+    + clear()
+    + logoff()
+    ' Calls ClientHelper (defined elsewhere)
   }
 
+  ' ClientHelper is removed from this specific diagram view
+
+  ' --- Server-Side UI Component ---
   class SMPServerUI {
-    -logArea: JTextArea
-    -isInitialised: boolean
-    +log(message: String)
-    +getInstance(): SMPServerUI
+    - logArea: JTextArea
+    - isInitialised: boolean
+    + {static} getInstance(): SMPServerUI
+    + log(message: String)
+    ' Used by SMPServer and SMPThread (defined elsewhere)
   }
+
 }
 
-' Relationships
-LoginWindow --> SMPClientUI : switches to after login
-SMPServerUI ..> SMPThread : listens to server logs
+' No relationships shown *within* this layer without ClientHelper
+' Relationships to ClientHelper or from SMPServerUI would involve
+' components defined outside this specific diagram view.
 
-note top of LoginWindow
-  **Presentation Layer**:
-  - Client: LoginWindow, SMPClientUI (user-facing).
-  - Server: SMPServerUI (debug logs).
-  - SMPServerUI is a singleton for centralized logging.
-end note
+
 @enduml

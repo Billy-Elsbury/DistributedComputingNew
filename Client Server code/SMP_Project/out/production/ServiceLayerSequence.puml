@@ -1,21 +1,78 @@
-@startuml Application_Layer_Sequence
-participant "SMPThread" as Thread
-participant "UserManager" as UserMgr
-participant "MessageStorage" as Storage
+@startuml ServerLayerSequence
+participant "SMPServer" as Server
+participant "MyStreamSocket" as SocketWrapper
+participant "SMPThread" as HandlerThread
 
-Thread -> UserMgr : verifyUser(username, password)
-UserMgr --> Thread : Success/Failure
-Thread -> Storage : uploadMessage(username, id, message)
-Storage --> Thread : Success/Failure
-Thread -> Storage : getMessageById(id)
-Storage --> Thread : Message/Error
-Thread -> Storage : getAllMessages()
-Storage --> Thread : List<String>
-Thread -> UserMgr : logoff(username)
+' SMPServer accepts connection (Simplified - external trigger)
+Server -> Server : Listens & Accepts Connection
 
-note right of Thread
-  **Application Layer**:
-  - Manages core logic (login, upload, download).
-  - Interacts with Service Layer for communication.
+' SMPServer sets up the communication channel and handler
+create SocketWrapper
+Server -> SocketWrapper : new MyStreamSocket(acceptedSocket)
+activate SocketWrapper
+SocketWrapper --> Server : socketInstance
+deactivate SocketWrapper
+
+create HandlerThread
+Server -> HandlerThread : new SMPThread(socketInstance)
+activate HandlerThread
+' HandlerThread now owns the SocketWrapper for this client
+
+Server -> HandlerThread : start()
+' Server is now free to accept other connections
+
+' SMPThread takes over communication for this client
+HandlerThread -> SocketWrapper : receiveMessage()
+activate SocketWrapper
+' SocketWrapper waits for/reads data from the client connection
+SocketWrapper --> HandlerThread : messageData / null
+deactivate SocketWrapper
+
+' Assume messageData requires processing and a response
+HandlerThread -> HandlerThread : Process messageData \n(e.g., call UserManager/Storage)
+HandlerThread -> SocketWrapper : sendMessage(responseData)
+activate SocketWrapper
+' SocketWrapper sends data back to the client connection
+SocketWrapper --> HandlerThread : (Send confirmation/void)
+deactivate SocketWrapper
+
+' ... further receive/send interactions occur ...
+
+' Example: Handling Logoff or Disconnect
+HandlerThread -> SocketWrapper : receiveMessage() ' Receives LOGOFF or detects disconnect (null)
+activate SocketWrapper
+SocketWrapper --> HandlerThread : "LOGOFF ..." / null
+deactivate SocketWrapper
+
+HandlerThread -> HandlerThread : Process Logoff/Disconnect
+
+HandlerThread -> SocketWrapper : sendMessage(confirmation) ' Optional confirmation
+activate SocketWrapper
+SocketWrapper --> HandlerThread : (Send confirmation/void)
+deactivate SocketWrapper
+
+
+HandlerThread -> SocketWrapper : close()
+activate SocketWrapper
+' SocketWrapper closes the underlying network socket
+SocketWrapper --> HandlerThread : (Close confirmation/void)
+deactivate SocketWrapper
+
+' HandlerThread finishes execution
+destroy HandlerThread
+
+note right of Server
+  **Server Role**:
+  - Accepts connections.
+  - Creates `MyStreamSocket` wrapper.
+  - Creates and starts dedicated `SMPThread` per connection.
+end note
+
+note right of HandlerThread
+  **Handler Thread Role**:
+  - Manages lifecycle for one client.
+  - Uses `MyStreamSocket` for I/O.
+  - Executes application logic.
+  - Closes socket on completion.
 end note
 @enduml

@@ -1,12 +1,10 @@
 @startuml Service_Layer
 package "Service Layer" {
     class MyStreamSocket {
-        +sendMessage(message: String)
-        +receiveMessage(): String
-        +close()
-    }
-    class SSLImplementation {
-        +createSSLSocket(host: String, port: int): SSLSocket
+        + MyStreamSocket(socket: Socket)
+        + sendMessage(message: String)
+        + receiveMessage(): String
+        + close()
     }
 }
 
@@ -16,6 +14,4 @@ note top of MyStreamSocket
   - Includes MyStreamSocket and SSLImplementation.
 end note
 
-' Relationships within the Service Layer
-MyStreamSocket --> SSLImplementation : uses for secure communication
 @enduml
